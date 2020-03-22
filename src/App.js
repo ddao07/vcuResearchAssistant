@@ -121,62 +121,74 @@ class App extends Component {
 
   setTreeDataFromCSV(csvFile, attributeFields) 
   {   
-      function handleColumn(column) {
-        if (column['Time'] < 800) { 
-          return column;
-        }
+    function handleColumn(column) 
+    {
+      if (column['Time'] < 800) 
+      { 
+        return column;
       }
+    }
 
-      return d3.csv(csvFile, handleColumn)
-        .then(flatArray => {
-          console.log(flatArray)
-          var hierarchy = flatToHierarchy(flatArray)
-          function flatToHierarchy (flatArray) {
-          var numRoots = 0
-          var hierarchy = []
-
-          for (var i = 0; i < flatArray.length; i++) {
-            if (flatArray[i].PID == "Root Node") {
-              hierarchy[numRoots] = makeObj(i) 
-              ++numRoots
-            }
+    return d3.csv(csvFile, handleColumn)
+    .then(flatArray =>
+    {
+      console.log(flatArray)
+      var hierarchy = flatToHierarchy(flatArray)
+      function flatToHierarchy (flatArray) 
+      {
+        var numRoots = 0
+        var hierarchy = []
+        for (var i = 0; i < flatArray.length; i++) 
+        {
+          if (flatArray[i].PID === "Root Node") 
+          {
+            hierarchy[numRoots] = makeObj(i) 
+            ++numRoots
           }
-          
-          function makeObj(i) {
-            var obj = {name: flatArray[i].ID, attributes: getAttributes(i), children: getChildren(i)}
-            var childs = getChildren(i)
-            if (childs.length == 0) {
-              return {name: flatArray[i].ID, attributes: getAttributes(i)}
-            }
-            return obj
-          }
-
-          function getAttributes(i) {
-            return {PID: flatArray[i].PID, ID: flatArray[i].ID, Miner: flatArray[i].Miner, Time: flatArray[i].Time}
-          }
-
-          function getChildren(i) {
-            var childs = []
-            var numChilds = 0
-            for (var j = 0; j < flatArray.length; j++) {
-              if (flatArray[j].PID == flatArray[i].ID) {
-                childs[numChilds] = makeObj(j)
-                ++numChilds   
-              }
-            }
-            
-            return childs
-          }
-          console.log(hierarchy)
-          return hierarchy
         }
-        return hierarchy
-      })
-      .then(hierarchy => {
+          
+        function makeObj(i) 
+        {
+          var childs = getChildren(i)
+          var attributes = getAttributes(i)
+          var obj = {name: flatArray[i].ID, attributes: attributes, children: childs}
+          if (childs.length === 0) 
+          {
+            return {name: flatArray[i].ID, attributes: attributes}
+          }
+          return obj
+        }
+
+        function getAttributes(i) 
+        {
+          return {PID: flatArray[i].PID, ID: flatArray[i].ID, Miner: flatArray[i].Miner, Time: flatArray[i].Time}
+        }
+
+        function getChildren(i) 
+        {
+          var childs = []
+          var numChilds = 0
+          for (var j = 0; j < flatArray.length; j++) 
+          {
+            if (flatArray[j].PID === flatArray[i].ID) 
+            {
+              childs[numChilds] = makeObj(j)
+              ++numChilds   
+            }
+          }
+          return childs
+        }
         console.log(hierarchy)
-        this.setState({ data: hierarchy })
-      })
-      .catch(err => console.error(err));
+        return hierarchy
+      }
+      return hierarchy
+    })
+    .then(hierarchy => 
+    {
+      console.log(hierarchy)
+      this.setState({ data: hierarchy })
+    })
+    .catch(err => console.error(err));
   }
 
   setTreeDataFromJSON(jsonFile) {
